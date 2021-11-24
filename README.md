@@ -1,2 +1,11 @@
-# mission_planner
-Plan and execute autonomous navigation missions for ROS robots.
+# Mission
+
+<!-- desc etc. -->
+
+## Getting Started
+
+<!-- descriptive guide/overview, then step by step -->
+
+## ROS Specification
+
+<!-- messages, default topics, server, etc. -->
