@@ -5,7 +5,9 @@ construct, manage, and execute autonomous navigation missions for robots.
 
 This ROS package which provides Mission uses a server-client architecture, which
 includes a ROS server that handles the backend processing, allowing alternative
-clients to be developed that can interface with the server.
+clients to be developed that can interface with the server. The ROS server uses
+the [ROS Navigation Stack](https://github.com/ros-planning/navigation) as the
+infastructure which implements the execution of autonomous navigation.
 
 ## Getting Started
 
