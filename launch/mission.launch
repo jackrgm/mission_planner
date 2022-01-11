@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<launch>
+    <!-- to cancel currently active goals -->
+    <remap from="/move_base/cancel" to="/move_base/cancel"/>
+
+    <!-- to get the odom frame id -->
+    <remap from="/odom" to="/odom"/>
+
+    <!-- for getting the robot's current yaw -->
+    <remap from="/odometry/filtered" to="/odometry/filtered"/>
+
+    <!-- for sending a PoseStamped goal (to be converted) -->
+    <remap from="/gps_goal_pose" to="/gps_goal_pose"/>
+
+    <!-- for getting the robot's pos reported by its gps module-->
+    <remap from="/navsat/fix" to="/navsat/fix"/>
+
+    <!-- for checking status of the robot's navigation to the current goal -->
+    <remap from="/move_base/status" to="/move_base/status"/>
+  <node pkg="mission_planner" type="mission" name="mission" output="screen"/>
+</launch>
