@@ -14,7 +14,8 @@ infastructure which implements the execution of autonomous navigation.
 Mission is currently under development, being taken from an old personal
 project and being redesigned, therefore the project code is currently in a
 work-in-progress state and is not yet currently ready for release and public
-use. However, you can view the current code in the `dev` branch. Changes are
+use. However, you can view the current code in the
+[dev](https://github.com/jackrgm/mission_planner/tree/dev) branch. Changes are
 rapid and unpredictable in this state until a first major version release.
 
 ## Getting Started
