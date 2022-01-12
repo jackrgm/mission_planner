@@ -30,4 +30,6 @@ rapid and unpredictable in this state until a first major version release.
 The following known front end applications can be used to interface with
 the server:
 
-* Mission Qt (mission_planner_qt) - a Qt-based desktop GUI application.
+* Mission Qt
+  ([mission_planner_qt](https://github.com/jackrgm/mission_planner_qt/)) - a
+  Qt-based desktop GUI application.
