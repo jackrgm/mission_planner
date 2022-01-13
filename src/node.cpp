@@ -1,6 +1,3 @@
-// TODO check best-practice correct ordering of header files (system vs etc)
-#include "geometry_msgs/PoseStamped.h"
-#include "mission_planner/node.h"
 #include <iostream>
 #include <ros/console.h>
 #include <std_msgs/Float64.h>
@@ -8,6 +5,8 @@
 #include <tf2/LinearMath/Quaternion.h>
 #include <tf/LinearMath/Quaternion.h>
 #include <tf/LinearMath/Matrix3x3.h>
+#include "geometry_msgs/PoseStamped.h"
+#include "mission_planner/node.h"
 
 namespace mission_planner {
   Node::Node()
@@ -27,13 +26,11 @@ namespace mission_planner {
     ROS_DEBUG("Destroying node...");
   }
 
-  // TODO implement getRobotLat
   double Node::getRobotLat() const
   {
     return pos_lat;
   }
 
-  // TODO implement getRobotLon
   double Node::getRobotLon() const
   {
     return pos_lon;
@@ -111,7 +108,6 @@ namespace mission_planner {
     this->pub_goal.publish(msg_pstamp);
   }
 
-  // TODO verify navigation status is updated (to 'cancelled' or whatever)
   void Node::cancelGoal()
   {
     status = ABORTED;
@@ -127,8 +123,8 @@ namespace mission_planner {
     ROS_DEBUG("msg_pos callback triggered, received robot's reported position");
   }
 
-  // TODO algorithm probably needs optimising (read up on msgs types etc)
-  void Node::callbackStatus(const actionlib_msgs::GoalStatusArray::ConstPtr &msg_status)
+  void Node::callbackStatus(const actionlib_msgs::GoalStatusArray::ConstPtr
+  &msg_status)
   {
     if (!msg_status->status_list.empty())
     {
@@ -136,22 +132,25 @@ namespace mission_planner {
       status = static_cast<GoalState>(gstat.status);
     }
 
-    ROS_DEBUG("Callback triggered, received new goal status");
+    ROS_DEBUG("Callback triggered; received new goal status.");
     return;
   }
 
   void Node::callbackOdometry(const nav_msgs::Odometry &msg_odom)
   {
     double roll, pitch, yaw;
+
+	// Convert input odometry into a quarternion for tf::Matrix3x3.
     tf::Quaternion quat(msg_odom.pose.pose.orientation.x,
       msg_odom.pose.pose.orientation.y, msg_odom.pose.pose.orientation.z,
       msg_odom.pose.pose.orientation.w);
 
+	// Get the yaw value from the quarternion.
     tf::Matrix3x3 matr(quat);
     matr.getRPY(roll, pitch, yaw);
 
+	// Store (converted) input data from ROS into member variables.
     pos_yaw = yaw;
-
     robot_velocity = msg_odom.twist.twist.linear.x;
 
     ROS_DEBUG("Callback triggered, received robot's reported yaw");
@@ -160,9 +159,13 @@ namespace mission_planner {
 
   bool Node::isMoving()
   {
-    // TODO magic numbers; they would be better as member variables
-      // values seem like a reasonable definition of 'stopped' with some margin
-    if (robot_velocity < -0.05 || robot_velocity > 0.05)
+	/*
+	 * TODO Magic numbers; they would be better as member variables.
+     * Values seem like a reasonable definition of 'stopped' with some margin.
+	 * These values should also be configurable (i.e. from a text file or
+	 * interface.
+     */
+	if (robot_velocity < -0.05 || robot_velocity > 0.05)
     {
       return true;
     }
@@ -174,6 +177,7 @@ namespace mission_planner {
 
   int Node::update()
   {
+	// Fetch an update from all subscribed topics.
     ros::spinOnce();
     return 0;
   }

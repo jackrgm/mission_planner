@@ -1,10 +1,6 @@
 #ifndef NODE_H
 #define NODE_H
 
-// NOTE might be worth having 'node' for generalised ros comms
-  // e.g. 'n.publish(type, topic)', etc.
-  // + 'nodeMission' for application-specific 'nm.sendGoal(lat, lon, orient)'
-
 #include <actionlib_msgs/GoalStatusArray.h>
 #include <geometry_msgs/Twist.h>
 #include <nav_msgs/Odometry.h>
@@ -14,15 +10,38 @@
 #include <string>
 
 namespace mission_planner {
-  // ros node and all its ros communication functions
-  // TODO add a setMsgType to go between NavSatFix, PoseStamped, etc.(?)
+  // TODO Split between a base class (Node) and derived class (NodeMission).
+  /* 
+   * TODO Add more variations to make Node more generalised (e.g. different msg
+   * types, subscriber map, publisher map)
+   */
+  /*
+   * Encapsulates ROS communication and ROS-related logic, used as a gateway
+   * between ROS and the rest of the system.
+   *
+   * The main benefit to this over more common approaches (where ROS logic is
+   * used in main etc) is that ROS is abstracted from the system and potential
+   * middleware alternatives could be used without major adaptions to a system.
+   */
   class Node
   {
     public:
+	  // Creates and manages its own NodeHandle if one isn't supplied.
       Node();
+
+	  /*
+	   * Makes a local copy of a provided NodeHandle. This constructor is likely
+	   * to be used when working with multiple ROS-related objects that should
+	   * use the same NodeHandle reference.
+	   */
       Node(ros::NodeHandle *n);
+
       ~Node();
 
+      /*
+	   * Models the same states used by move_base, to reflect updates from the
+	   * ROS Navigation Stack.
+	   */
       enum GoalState
       {
         PENDING,
@@ -37,18 +56,42 @@ namespace mission_planner {
         LOST
       };
 
+      /*
+	   * Send a goal indirectly to move_base, by first sending the coordinates
+	   * to a middle-man node that should convert the satellite coordinates into
+	   * the standardised ROS coordinate frames (see ROS REP 105).
+	   */
       void sendGoal(double lat, double lon, double yaw);
+
+	  // Sends a cancel request to move_base.
       void cancelGoal();
+
+	  // Return the stored move_base status from the last update received.
       GoalState getStatus() const;
+
+	  // Return the latitude of the robot's last known position.
       double getRobotLat() const;
+
+	  // Return the longitude of the robot's last known position.
       double getRobotLon() const;
+
+	  // Return the (orientation) of the robot's last known position.
       double getRobotYaw() const;
+
+	  // Return whether the robot has reached the current goal or not.
       bool goalAchieved();
+
+	  // Return if the goal is still active (or false if cancelled etc.)
       bool goalStillActive();
+
+	  // Run all callback functions to get an update from subscribed topics.
       int update();
+
+      // Return whether the robot is currently moving.
       bool isMoving();
 
     private:
+
       sensor_msgs::NavSatFix msg_goal;
       actionlib_msgs::GoalStatusArray msg_status;
       ros::NodeHandle nh;
